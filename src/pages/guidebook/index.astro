@@ -1,24 +1,64 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { LINES, lineOf } from '../../data/home';
 
-const vols = (await getCollection('guidebook')).sort(
-  (a, b) => a.data.volume - b.data.volume,
-);
+const vols = (await getCollection('guidebook')).sort((a, b) => a.data.volume - b.data.volume);
 ---
 
-<BaseLayout title="詳細ガイドブック">
-  <p class="breadcrumb"><a href="/">トップ</a> ＞ 詳細ガイドブック</p>
-  <h1>詳細ガイドブック（全15巻）</h1>
-  <ul class="item-list">
-    {vols.map((v) => (
-      <li>
-        <span class="vol-no">第{v.data.volume}巻</span>
-        {v.data.status === 'published'
-          ? <a href={`/guidebook/${v.id}/`}>{v.data.title}</a>
-          : <>{v.data.title}<span class="badge">準備中</span></>}
-        {v.data.pdf && <> （<a href={v.data.pdf}>PDF</a>）</>}
-      </li>
-    ))}
-  </ul>
+<BaseLayout title="詳細ガイドブック" full>
+  <PageHeader
+    kicker="GUIDEBOOK"
+    title="詳細ガイドブック（全15巻）"
+    lead="1巻あたり25〜40ページ。事例と演習で、概要版の各章を深めます。巻の番号は概要版の章の番号と対応しています。"
+    crumbs={[{ label: '詳細ガイドブック' }]}
+  />
+
+  <div class="container section-gap">
+    <div class="legend" aria-label="路線の色">
+      {LINES.map((l) => (
+        <span class="legend-item"><span class="legend-swatch" style={`background:${l.color}`}></span>{l.name}</span>
+      ))}
+    </div>
+    <ol class="vols">
+      {vols.map((v) => {
+        const line = lineOf(v.data.volume);
+        const href = v.data.status === 'published' ? `/guidebook/${v.id}/` : undefined;
+        return (
+          <li class="vol" style={`--line-color:${line.color}`}>
+            <div class="vol-head">
+              <span class="vol-label">VOL.</span>
+              <span class="vol-num">{String(v.data.volume).padStart(2, '0')}</span>
+            </div>
+            <div class="vol-body">
+              {href ? <a class="vol-title" href={href}>{v.data.title}</a> : <span class="vol-title">{v.data.title}</span>}
+              {v.data.summary && <p class="vol-summary">{v.data.summary}</p>}
+            </div>
+            <div class="vol-foot">
+              {v.data.status === 'published' ? <span class="badge badge-ok">公開中</span> : <span class="badge">準備中</span>}
+              {v.data.pdf && <a class="pdf" href={v.data.pdf}>PDF</a>}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
 </BaseLayout>
+
+<style>
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; font-weight: 700; margin-bottom: 24px; }
+  .legend-item { display: inline-flex; align-items: center; gap: 8px; }
+  .legend-swatch { width: 28px; height: 8px; border-radius: 4px; }
+  .vols { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 16px; }
+  .vol { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; border-top: 8px solid var(--line-color); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .vol-head { display: flex; align-items: baseline; gap: 6px; color: var(--line-color); font-family: var(--font-num); font-weight: 700; }
+  .vol-label { font-size: 13px; }
+  .vol-num { font-size: 36px; line-height: 1; }
+  .vol-body { flex: 1; }
+  .vol-title { font-family: var(--font-head); font-weight: 900; font-size: 18px; line-height: 1.5; color: var(--ink); }
+  a.vol-title { color: var(--navy); }
+  .vol-summary { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+  .vol-foot { display: flex; gap: 8px; align-items: center; }
+  .pdf { font-family: var(--font-num); font-size: 13px; font-weight: 700; }
+</style>

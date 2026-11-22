@@ -1,0 +1,47 @@
+---
+// 下層ページ共通の見出し帯（方眼の背景・パンくず・小見出し・タイトル・説明）
+interface Crumb { href?: string; label: string }
+interface Props {
+  title: string;
+  kicker?: string;
+  lead?: string;
+  crumbs?: Crumb[];
+  color?: string; // 小見出しと上の帯の色（路線色など）
+}
+const { title, kicker, lead, crumbs = [], color = 'var(--accent)' } = Astro.props;
+---
+
+<section class="page-header" style={`--ph-color:${color}`}>
+  <div class="container page-header-inner">
+    {crumbs.length > 0 && (
+      <nav class="crumbs" aria-label="現在の位置">
+        <ol>
+          <li><a href="/">トップ</a></li>
+          {crumbs.map((c) => (
+            <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>
+          ))}
+        </ol>
+      </nav>
+    )}
+    {kicker && <p class="ph-kicker">{kicker}</p>}
+    <h1 class="ph-title">{title}</h1>
+    {lead && <p class="ph-lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-header {
+    background-color: var(--paper);
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+    border-bottom: 1px solid var(--line);
+    border-top: 6px solid var(--ph-color);
+  }
+  .page-header-inner { padding-top: 40px; padding-bottom: 48px; display: flex; flex-direction: column; gap: 12px; }
+  .crumbs ol { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; font-size: 13px; color: var(--muted); }
+  .crumbs li + li::before { content: '›'; margin: 0 8px 0 4px; color: #8FA3B8; }
+  .ph-kicker { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; color: var(--ph-color); }
+  .ph-title { margin: 0; font-family: var(--font-head); font-weight: 900; font-size: clamp(28px, 5vw, 44px); line-height: 1.35; word-break: auto-phrase; text-wrap: pretty; }
+  .ph-lead { margin: 4px 0 0; font-size: 17px; color: var(--ink-soft); max-width: 40em; }
+</style>

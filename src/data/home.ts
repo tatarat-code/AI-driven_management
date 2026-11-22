@@ -36,3 +36,8 @@ export const COMPANIES = [
   { name: 'C社', profile: '金属部品加工（地域の製造業）／45名', roic: [11.8, 7.2, 3.9], cause: '稼働率と固定費' },
 ];
 export const ROIC_SCALE_MAX = 12; // 棒の長さの基準（%）
+
+// 章番号（または巻番号）から路線を引く。巻nは章nと同じ路線に属する
+export function lineOf(no: number) {
+  return LINES.find((l) => l.chapters.includes(no)) ?? LINES[0];
+}

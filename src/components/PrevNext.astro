@@ -1,0 +1,31 @@
+---
+// 前後の章・巻へのリンク
+interface Item { href: string; label: string; sub: string }
+interface Props { prev?: Item; next?: Item; back: { href: string; label: string } }
+const { prev, next, back } = Astro.props;
+---
+
+<nav class="prevnext" aria-label="前後のページ">
+  {prev ? (
+    <a class="pn pn-prev" href={prev.href}><span class="pn-sub">← {prev.sub}</span><span class="pn-label">{prev.label}</span></a>
+  ) : <span></span>}
+  <a class="pn-back" href={back.href}>{back.label}</a>
+  {next ? (
+    <a class="pn pn-next" href={next.href}><span class="pn-sub">{next.sub} →</span><span class="pn-label">{next.label}</span></a>
+  ) : <span></span>}
+</nav>
+
+<style>
+  .prevnext { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: stretch; margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--line); }
+  .pn { display: flex; flex-direction: column; gap: 2px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; text-decoration: none; color: var(--ink); }
+  .pn:hover { border-color: var(--navy); }
+  .pn-next { text-align: right; }
+  .pn-sub { font-family: var(--font-num); font-size: 13px; font-weight: 700; color: var(--accent); }
+  .pn-label { font-weight: 700; }
+  .pn-back { align-self: center; font-weight: 700; font-size: 14px; }
+  @media (max-width: 640px) {
+    .prevnext { grid-template-columns: 1fr; }
+    .pn-back { order: 3; justify-self: center; }
+    .pn-next { text-align: left; }
+  }
+</style>

@@ -2,9 +2,10 @@
 // トップページ：インフォグラフィックLP（デザイン案A＋C「設計図×路線図」）
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import RouteMap from '../components/RouteMap.astro';
 import { SITE } from '../site';
 import {
-  STATS, MATURITY, LINES, TRANSFER_CHAPTER, TERMINAL_CHAPTER, COMPANIES, ROIC_SCALE_MAX,
+  STATS, MATURITY, COMPANIES, ROIC_SCALE_MAX,
 } from '../data/home';
 
 // 新着情報（新しい順に5件）
@@ -13,23 +14,6 @@ const news = (await getCollection('news'))
   .slice(0, 5);
 const fmt = (d: Date) =>
   `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-
-// 路線図の駅：概要版の各章（タイトルの「第n章」は外して表示）
-const chapters = (await getCollection('overview')).filter((c) => c.data.order >= 1 && c.data.order <= 15);
-const stations = LINES.flatMap((line) =>
-  line.chapters.map((no) => {
-    const ch = chapters.find((c) => c.data.order === no);
-    return {
-      no,
-      color: line.color,
-      label: ch ? ch.data.title.replace(/^第\d+章\s*/, '') : `第${no}章`,
-      href: ch && ch.data.status === 'published' ? `/overview/${ch.id}/` : undefined,
-      transfer: no === TRANSFER_CHAPTER,
-      terminal: no === TERMINAL_CHAPTER,
-      first: no === 1,
-    };
-  }),
-);
 
 const pct = (v: number) => `${((v / ROIC_SCALE_MAX) * 100).toFixed(1)}%`;
 const barColors = ['#8FA8C3', '#3F6189', '#1B3A5C'];
@@ -118,31 +102,7 @@ const barColors = ['#8FA8C3', '#3F6189', '#1B3A5C'];
     <p class="kicker">学びの路線図</p>
     <h2 class="block-title">15章を、5つの路線でたどる</h2>
     <p class="block-lead">どの路線から乗っても、第4章「会計を共通言語に」で財務ハブ線に乗り換え、終点の第15章でAX計画書を書き上げます。各駅は概要版でつかみ、詳細ガイドブックで深めます。</p>
-    <div class="route">
-      <div class="route-legend">
-        {LINES.map((l) => (
-          <span class="legend-item"><span class="legend-swatch" style={`background:${l.color}`}></span>{l.name}</span>
-        ))}
-      </div>
-      <ol class="stations">
-        {stations.map((s) => (
-          <li class="station">
-            <div class="track">
-              <div class:list={['rail', { 'rail-start': s.first, 'rail-end': s.terminal }]} style={`background:${s.color}`}></div>
-              {s.terminal
-                ? <div class="stop stop-terminal" style={`background:${s.color}`}></div>
-                : <div class:list={['stop', { 'stop-transfer': s.transfer }]} style={`border-color:${s.color}`}></div>}
-            </div>
-            <span class="station-no" style={`color:${s.color}`}>
-              {String(s.no).padStart(2, '0')}{s.transfer && ' 乗換'}{s.terminal && ' 終点'}
-            </span>
-            {s.href
-              ? <a class:list={['station-name', { strong: s.transfer || s.terminal }]} href={s.href}>{s.label}</a>
-              : <span class:list={['station-name', { strong: s.transfer || s.terminal }]}>{s.label}</span>}
-          </li>
-        ))}
-      </ol>
-    </div>
+    <RouteMap />
   </section>
 
   <!-- 5. 模擬企業3社 -->
@@ -221,16 +181,10 @@ const barColors = ['#8FA8C3', '#3F6189', '#1B3A5C'];
   }
   .hero-inner { padding-top: 80px; padding-bottom: 88px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr)); gap: 56px; align-items: center; }
   .hero-text { display: flex; flex-direction: column; gap: 24px; }
-  .eyebrow, .kicker { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; }
-  .eyebrow { color: var(--navy); }
-  .kicker { color: var(--accent); }
+  .eyebrow { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; color: var(--navy); }
   .hero-title { margin: 0; font-weight: 900; font-size: clamp(36px, 6vw, 56px); line-height: 1.3; text-wrap: balance; }
   .hero-lead { margin: 0; font-size: 18px; color: var(--ink-soft); max-width: 34em; }
   .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
-  .btn { display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 8px; font-weight: 700; text-decoration: none; }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:hover { background: #95420F; color: #fff; }
-  .btn-secondary { border: 2px solid var(--navy); color: var(--navy); background: var(--paper); }
 
   .roic-tree { margin: 0; background: var(--paper); border: 1px solid #C9D4E0; border-radius: 16px; padding: 32px; box-shadow: 0 24px 48px -24px rgba(20, 32, 46, 0.25); }
   .roic-tree figcaption { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 20px; }
@@ -248,7 +202,6 @@ const barColors = ['#8FA8C3', '#3F6189', '#1B3A5C'];
   .leaf { display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .leaf-name { background: #EEF2F7; border-radius: 8px; padding: 8px; text-align: center; font-size: 14px; width: 100%; }
   .tag { font-size: 12px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 999px; padding: 2px 10px; }
-  .note { margin: 16px 0 0; font-size: 13px; color: var(--muted); }
 
   .stats { background: var(--navy); color: #fff; }
   .stats-inner { padding-top: 40px; padding-bottom: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 24px; }
@@ -266,29 +219,6 @@ const barColors = ['#8FA8C3', '#3F6189', '#1B3A5C'];
   .step { min-height: var(--h); border-radius: 12px 12px 4px 4px; padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; }
   .step-no { font-family: var(--font-num); font-weight: 700; font-size: 32px; line-height: 1; }
   .step-name { font-weight: 700; font-size: 18px; }
-
-  .route {
-    background-color: var(--paper);
-    background-image: linear-gradient(#EEF2F7 1px, transparent 1px), linear-gradient(90deg, #EEF2F7 1px, transparent 1px);
-    background-size: 32px 32px;
-    border: 1px solid #C9D4E0; border-radius: 16px; padding: 36px 28px; display: flex; flex-direction: column; gap: 28px;
-  }
-  .route-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; font-weight: 700; }
-  .legend-item { display: inline-flex; align-items: center; gap: 8px; }
-  .legend-swatch { width: 28px; height: 8px; border-radius: 4px; }
-  .stations { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(132px, 100%), 1fr)); row-gap: 28px; }
-  .station { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-  .track { position: relative; width: 100%; height: 30px; display: flex; align-items: center; justify-content: center; }
-  .rail { position: absolute; left: 0; right: 0; height: 8px; }
-  .rail-start { left: 50%; }
-  .rail-end { right: 50%; }
-  .stop { position: relative; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 5px solid; }
-  .stop-transfer { width: 30px; height: 30px; border-width: 6px; }
-  .stop-terminal { width: 28px; height: 28px; border-radius: 6px; border: none; }
-  .station-no { font-family: var(--font-num); font-weight: 700; font-size: 13px; }
-  .station-name { font-size: 14px; font-weight: 500; padding: 0 6px; color: var(--ink); }
-  a.station-name { color: var(--navy); }
-  .station-name.strong { font-weight: 700; }
 
   .companies { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 20px; }
   .company { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }

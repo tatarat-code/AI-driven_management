@@ -3,6 +3,7 @@
 // 例：syllabus.md → /syllabus/、about.md → /about/
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
 
 export async function getStaticPaths() {
   const pages = await getCollection('pages');
@@ -11,12 +12,19 @@ export async function getStaticPaths() {
 
 const { p } = Astro.props;
 const { Content } = await render(p);
+const kickers: Record<string, string> = { syllabus: 'SYLLABUS', about: 'ABOUT' };
 ---
 
-<BaseLayout title={p.data.title} description={p.data.description}>
-  <p class="breadcrumb"><a href="/">トップ</a> ＞ {p.data.title}</p>
-  <article>
-    <h1>{p.data.title}</h1>
-    <Content />
-  </article>
+<BaseLayout title={p.data.title} description={p.data.description} full>
+  <PageHeader
+    kicker={kickers[p.id] ?? 'PAGE'}
+    title={p.data.title}
+    lead={p.data.description}
+    crumbs={[{ label: p.data.title }]}
+  />
+  <div class="container section-gap">
+    <article class="prose">
+      <Content />
+    </article>
+  </div>
 </BaseLayout>

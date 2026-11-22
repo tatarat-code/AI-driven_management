@@ -1,24 +1,52 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import PrevNext from '../../components/PrevNext.astro';
+import { lineOf } from '../../data/home';
 
 // 公開済み（status: published）の章だけページを作る
 export async function getStaticPaths() {
-  const chapters = await getCollection('overview', (c) => c.data.status === 'published');
-  return chapters.map((c) => ({ params: { id: c.id }, props: { c } }));
+  const all = (await getCollection('overview', (c) => c.data.status === 'published')).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+  return all.map((c, i) => ({ params: { id: c.id }, props: { c, prev: all[i - 1], next: all[i + 1] } }));
 }
 
-const { c } = Astro.props;
+const { c, prev, next } = Astro.props;
 const { Content } = await render(c);
+const isChapter = c.data.order >= 1 && c.data.order <= 15;
+const line = isChapter ? lineOf(c.data.order) : undefined;
+const kicker = isChapter ? `CHAPTER ${String(c.data.order).padStart(2, '0')}｜${line!.name}` : 'OVERVIEW';
+const item = (x?: typeof c) => (x ? { href: `/overview/${x.id}/`, label: x.data.title, sub: '概要版' } : undefined);
+const volId = `vol${String(c.data.order).padStart(2, '0')}`;
+const volPublished = isChapter && (await getCollection('guidebook', (v) => v.id === volId && v.data.status === 'published')).length > 0;
+const vol = volPublished ? `/guidebook/${volId}/` : undefined;
 ---
 
-<BaseLayout title={`概要版 ${c.data.title}`} description={c.data.summary}>
-  <p class="breadcrumb">
-    <a href="/">トップ</a> ＞ <a href="/overview/">概要版</a> ＞ {c.data.title}
-  </p>
-  <article>
-    <h1>{c.data.title}</h1>
-    {c.data.pdf && <p><a href={c.data.pdf}>PDF版をダウンロード</a></p>}
-    <Content />
-  </article>
+<BaseLayout title={`概要版 ${c.data.title}`} description={c.data.summary} full>
+  <PageHeader
+    kicker={kicker}
+    title={c.data.title}
+    lead={c.data.summary}
+    color={line?.color}
+    crumbs={[{ href: '/overview/', label: '概要版' }, { label: c.data.title }]}
+  >
+    <div class="actions">
+      {c.data.pdf && <a class="btn btn-primary" href={c.data.pdf}>PDF版をダウンロード</a>}
+      {vol && <a class="btn btn-secondary" href={vol}>詳細ガイドブック 第{c.data.order}巻へ</a>}
+    </div>
+  </PageHeader>
+
+  <div class="container section-gap">
+    <article class="prose">
+      <Content />
+    </article>
+    <PrevNext prev={item(prev)} next={item(next)} back={{ href: '/overview/', label: '概要版の一覧' }} />
+  </div>
 </BaseLayout>
+
+<style>
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+  .actions:empty { display: none; }
+</style>

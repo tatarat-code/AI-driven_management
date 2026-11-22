@@ -1,24 +1,43 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 
-const items = (await getCollection('news')).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
-const entries = await Promise.all(
-  items.map(async (n) => ({ n, Content: (await render(n)).Content })),
-);
+const items = (await getCollection('news')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const entries = await Promise.all(items.map(async (n) => ({ n, Content: (await render(n)).Content })));
 const fmt = (d: Date) =>
-  `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 ---
 
-<BaseLayout title="新着情報">
-  <p class="breadcrumb"><a href="/">トップ</a> ＞ 新着情報</p>
-  <h1>新着情報</h1>
-  {entries.map(({ n, Content }) => (
-    <article class="section">
-      <h2><span class="news-date">{fmt(n.data.date)}</span>{n.data.title}</h2>
-      <Content />
-    </article>
-  ))}
+<BaseLayout title="新着情報" full>
+  <PageHeader
+    kicker="NEWS"
+    title="新着情報"
+    lead="教材の公開・更新のお知らせです。"
+    crumbs={[{ label: '新着情報' }]}
+  />
+  <div class="container section-gap">
+    <ol class="timeline">
+      {entries.map(({ n, Content }) => (
+        <li class="entry">
+          <time class="entry-date" datetime={n.data.date.toISOString().slice(0, 10)}>{fmt(n.data.date)}</time>
+          <article class="entry-body">
+            <h2 class="entry-title">{n.data.link ? <a href={n.data.link}>{n.data.title}</a> : n.data.title}</h2>
+            <div class="prose entry-text"><Content /></div>
+          </article>
+        </li>
+      ))}
+    </ol>
+  </div>
 </BaseLayout>
+
+<style>
+  .timeline { list-style: none; margin: 0; padding: 0; max-width: 860px; }
+  .entry { display: grid; grid-template-columns: 9em 1fr; gap: 8px 24px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+  .entry:first-child { border-top: 1px solid var(--line); }
+  .entry-date { font-family: var(--font-num); font-weight: 700; color: var(--accent); padding-top: 4px; }
+  .entry-title { margin: 0 0 8px; font-size: 20px; font-weight: 900; }
+  .entry-text { font-size: 16px; }
+  .entry-text :global(p:last-child) { margin-bottom: 0; }
+  @media (max-width: 640px) { .entry { grid-template-columns: 1fr; } }
+</style>

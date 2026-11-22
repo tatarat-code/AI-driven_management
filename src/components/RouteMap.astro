@@ -1,0 +1,72 @@
+---
+// 15章の路線図（トップページと概要版の一覧で共通に使う）
+import { getCollection } from 'astro:content';
+import { LINES, TRANSFER_CHAPTER, TERMINAL_CHAPTER } from '../data/home';
+
+const chapters = (await getCollection('overview')).filter((c) => c.data.order >= 1 && c.data.order <= 15);
+const stations = LINES.flatMap((line) =>
+  line.chapters.map((no) => {
+    const ch = chapters.find((c) => c.data.order === no);
+    return {
+      no,
+      color: line.color,
+      label: ch ? ch.data.title.replace(/^第\d+章\s*/, '') : `第${no}章`,
+      href: ch && ch.data.status === 'published' ? `/overview/${ch.id}/` : undefined,
+      transfer: no === TRANSFER_CHAPTER,
+      terminal: no === TERMINAL_CHAPTER,
+      first: no === 1,
+    };
+  }),
+);
+---
+
+<div class="route">
+  <div class="route-legend">
+    {LINES.map((l) => (
+      <span class="legend-item"><span class="legend-swatch" style={`background:${l.color}`}></span>{l.name}</span>
+    ))}
+  </div>
+  <ol class="stations">
+    {stations.map((s) => (
+      <li class="station">
+        <div class="track">
+          <div class:list={['rail', { 'rail-start': s.first, 'rail-end': s.terminal }]} style={`background:${s.color}`}></div>
+          {s.terminal
+            ? <div class="stop stop-terminal" style={`background:${s.color}`}></div>
+            : <div class:list={['stop', { 'stop-transfer': s.transfer }]} style={`border-color:${s.color}`}></div>}
+        </div>
+        <span class="station-no" style={`color:${s.color}`}>
+          {String(s.no).padStart(2, '0')}{s.transfer && ' 乗換'}{s.terminal && ' 終点'}
+        </span>
+        {s.href
+          ? <a class:list={['station-name', { strong: s.transfer || s.terminal }]} href={s.href}>{s.label}</a>
+          : <span class:list={['station-name', { strong: s.transfer || s.terminal }]}>{s.label}</span>}
+      </li>
+    ))}
+  </ol>
+</div>
+
+<style>
+  .route {
+    background-color: var(--paper);
+    background-image: linear-gradient(#EEF2F7 1px, transparent 1px), linear-gradient(90deg, #EEF2F7 1px, transparent 1px);
+    background-size: 32px 32px;
+    border: 1px solid #C9D4E0; border-radius: 16px; padding: 36px 28px; display: flex; flex-direction: column; gap: 28px;
+  }
+  .route-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; font-weight: 700; }
+  .legend-item { display: inline-flex; align-items: center; gap: 8px; }
+  .legend-swatch { width: 28px; height: 8px; border-radius: 4px; }
+  .stations { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(132px, 100%), 1fr)); row-gap: 28px; }
+  .station { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .track { position: relative; width: 100%; height: 30px; display: flex; align-items: center; justify-content: center; }
+  .rail { position: absolute; left: 0; right: 0; height: 8px; }
+  .rail-start { left: 50%; }
+  .rail-end { right: 50%; }
+  .stop { position: relative; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 5px solid; }
+  .stop-transfer { width: 30px; height: 30px; border-width: 6px; }
+  .stop-terminal { width: 28px; height: 28px; border-radius: 6px; border: none; }
+  .station-no { font-family: var(--font-num); font-weight: 700; font-size: 13px; }
+  .station-name { font-size: 14px; font-weight: 500; padding: 0 6px; color: var(--ink); }
+  a.station-name { color: var(--navy); }
+  .station-name.strong { font-weight: 700; }
+</style>
