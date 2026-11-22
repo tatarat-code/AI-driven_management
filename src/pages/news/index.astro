@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const items = (await getCollection('news')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const entries = await Promise.all(
+  items.map(async (n) => ({ n, Content: (await render(n)).Content })),
+);
+const fmt = (d: Date) =>
+  `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+---
+
+<BaseLayout title="新着情報">
+  <p class="breadcrumb"><a href="/">トップ</a> ＞ 新着情報</p>
+  <h1>新着情報</h1>
+  {entries.map(({ n, Content }) => (
+    <article class="section">
+      <h2><span class="news-date">{fmt(n.data.date)}</span>{n.data.title}</h2>
+      <Content />
+    </article>
+  ))}
+</BaseLayout>

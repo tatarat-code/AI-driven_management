@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const vols = (await getCollection('guidebook')).sort(
+  (a, b) => a.data.volume - b.data.volume,
+);
+---
+
+<BaseLayout title="詳細ガイドブック">
+  <p class="breadcrumb"><a href="/">トップ</a> ＞ 詳細ガイドブック</p>
+  <h1>詳細ガイドブック（全15巻）</h1>
+  <ul class="item-list">
+    {vols.map((v) => (
+      <li>
+        <span class="vol-no">第{v.data.volume}巻</span>
+        {v.data.status === 'published'
+          ? <a href={`/guidebook/${v.id}/`}>{v.data.title}</a>
+          : <>{v.data.title}<span class="badge">準備中</span></>}
+        {v.data.pdf && <> （<a href={v.data.pdf}>PDF</a>）</>}
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

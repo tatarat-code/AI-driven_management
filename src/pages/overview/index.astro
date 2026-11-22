@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const chapters = (await getCollection('overview')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<BaseLayout title="概要版">
+  <p class="breadcrumb"><a href="/">トップ</a> ＞ 概要版</p>
+  <h1>概要版</h1>
+  <ul class="item-list">
+    {chapters.map((c) => (
+      <li>
+        {c.data.status === 'published'
+          ? <a href={`/overview/${c.id}/`}>{c.data.title}</a>
+          : <>{c.data.title}<span class="badge">準備中</span></>}
+        {c.data.pdf && <> （<a href={c.data.pdf}>PDF</a>）</>}
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

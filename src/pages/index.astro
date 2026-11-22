@@ -1,0 +1,57 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, NAV } from '../site';
+
+const news = (await getCollection('news'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+
+const fmt = (d: Date) =>
+  `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+
+// サイト内目次（トップ以外）
+const sections = [
+  { href: '/overview/', label: '概要版', note: 'はじめに・全15章・付録。講義全体を見渡すための教材' },
+  { href: '/guidebook/', label: '詳細ガイドブック', note: '全15巻。各章をくわしく学ぶための教材' },
+  { href: '/syllabus/', label: 'シラバス', note: '授業の目的・計画・評価の方法' },
+  { href: '/news/', label: '新着情報', note: '教材の公開・更新のお知らせ' },
+  { href: '/about/', label: 'このサイトについて', note: 'サイトの目的と教材の利用について' },
+].filter((s) => NAV.some((n) => n.href === s.href));
+---
+
+<BaseLayout>
+  <!-- 1. 概要 -->
+  <section>
+    <h1>{SITE.name}</h1>
+    <p class="lead">{SITE.description}</p>
+    <p>（講義の概要は準備中です。）</p>
+  </section>
+
+  <!-- 2. サイト内目次 -->
+  <section class="section">
+    <h2>サイト内目次</h2>
+    <ul class="card-list">
+      {sections.map((s) => (
+        <li>
+          <h3><a href={s.href}>{s.label}</a></h3>
+          <p>{s.note}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- 3. 新着情報 -->
+  <section class="section">
+    <h2>新着情報</h2>
+    <ul class="item-list">
+      {news.map((n) => (
+        <li>
+          <span class="news-date">{fmt(n.data.date)}</span>
+          {n.data.link ? <a href={n.data.link}>{n.data.title}</a> : n.data.title}
+        </li>
+      ))}
+    </ul>
+    <p><a href="/news/">新着情報の一覧へ</a></p>
+  </section>
+</BaseLayout>

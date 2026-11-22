@@ -1,0 +1,14 @@
+{
+  // Cloudflare Workers（静的アセット）の設定
+  // Workers のダッシュボードで GitHub と連携し、
+  //   ビルドコマンド：npm run build
+  //   デプロイコマンド：npx wrangler deploy
+  // を指定する。
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ai-driven-management",
+  "compatibility_date": "2026-11-22",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

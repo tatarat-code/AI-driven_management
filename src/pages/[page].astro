@@ -1,0 +1,22 @@
+---
+// 単独ページ（src/content/pages/*.md）を /〈ファイル名〉/ で表示する
+// 例：syllabus.md → /syllabus/、about.md → /about/
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  return pages.map((p) => ({ params: { page: p.id }, props: { p } }));
+}
+
+const { p } = Astro.props;
+const { Content } = await render(p);
+---
+
+<BaseLayout title={p.data.title} description={p.data.description}>
+  <p class="breadcrumb"><a href="/">トップ</a> ＞ {p.data.title}</p>
+  <article>
+    <h1>{p.data.title}</h1>
+    <Content />
+  </article>
+</BaseLayout>

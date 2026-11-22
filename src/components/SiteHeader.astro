@@ -1,0 +1,14 @@
+---
+import { SITE, NAV } from '../site';
+---
+
+<header class="site-header">
+  <div class="container">
+    <a class="site-name" href="/">{SITE.name}</a>
+    <nav aria-label="サイト内の主なページ">
+      <ul>
+        {NAV.filter((n) => n.href !== '/').map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+</header>

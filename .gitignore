@@ -1,0 +1,27 @@
+# 依存パッケージ
+node_modules/
+
+# ビルド結果
+dist/
+.astro/
+
+# Cloudflare（Wrangler）のローカル作業ファイル
+.wrangler/
+.dev.vars*
+
+# 環境変数・秘密情報
+.env
+.env.*
+!.env.example
+
+# ログ
+npm-debug.log*
+*.log
+
+# OS・エディタ
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/

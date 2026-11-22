@@ -1,0 +1,11 @@
+# 改行コードをLFにそろえる（Windowsで編集しても差分が乱れないように）
+* text=auto eol=lf
+
+# バイナリ
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.zip binary

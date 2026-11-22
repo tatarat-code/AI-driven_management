@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// 公開済み（status: published）の章だけページを作る
+export async function getStaticPaths() {
+  const chapters = await getCollection('overview', (c) => c.data.status === 'published');
+  return chapters.map((c) => ({ params: { id: c.id }, props: { c } }));
+}
+
+const { c } = Astro.props;
+const { Content } = await render(c);
+---
+
+<BaseLayout title={`概要版 ${c.data.title}`} description={c.data.summary}>
+  <p class="breadcrumb">
+    <a href="/">トップ</a> ＞ <a href="/overview/">概要版</a> ＞ {c.data.title}
+  </p>
+  <article>
+    <h1>{c.data.title}</h1>
+    {c.data.pdf && <p><a href={c.data.pdf}>PDF版をダウンロード</a></p>}
+    <Content />
+  </article>
+</BaseLayout>
