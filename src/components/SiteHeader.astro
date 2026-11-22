@@ -3,8 +3,11 @@ import { SITE, NAV } from '../site';
 ---
 
 <header class="site-header">
-  <div class="container">
-    <a class="site-name" href="/">{SITE.name}</a>
+  <div class="container site-header-inner">
+    <a class="site-brand" href="/">
+      <span class="site-mark" aria-hidden="true">AX</span>
+      <span class="site-name">{SITE.name}</span>
+    </a>
     <nav aria-label="サイト内の主なページ">
       <ul>
         {NAV.filter((n) => n.href !== '/').map((n) => <li><a href={n.href}>{n.label}</a></li>)}

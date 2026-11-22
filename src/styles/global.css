@@ -1,42 +1,58 @@
-/* 仮のスタイル。サイトのデザインを決めたら差し替える */
+/* サイト共通のスタイル（デザイン：案A＋C「設計図×路線図」） */
 :root {
-  --text: #1f2328;
-  --muted: #5b636e;
-  --line: #d8dde3;
-  --accent: #1d4e89;
-  --bg: #ffffff;
-  --bg-soft: #f5f7fa;
-  font-family: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  --ink: #14202E;
+  --ink-soft: #3A4A5C;
+  --muted: #5A6B7E;
+  --navy: #1B3A5C;
+  --navy-deep: #0E2238;
+  --navy-mid: #3F6189;
+  --accent: #B4531B;
+  --line: #D5DDE7;
+  --grid: #E6ECF3;
+  --bg: #F6F8FB;
+  --paper: #FFFFFF;
+  --font-body: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  --font-head: 'Zen Kaku Gothic New', 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  --font-num: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+  font-family: var(--font-body);
   line-height: 1.8;
-  color: var(--text);
+  color: var(--ink);
   background: var(--bg);
 }
 
 * { box-sizing: border-box; }
 body { margin: 0; }
-a { color: var(--accent); }
+a { color: var(--navy); }
+a:hover { color: var(--navy-deep); }
 
-.container { max-width: 960px; margin: 0 auto; padding: 0 1.25rem; }
-main.container { padding-top: 2rem; padding-bottom: 3rem; min-height: 70vh; }
+.container { max-width: 1200px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+.main-page { padding-top: 2.5rem; padding-bottom: 4rem; min-height: 60vh; }
+.main-full { display: block; }
 
-.site-header { border-bottom: 1px solid var(--line); background: var(--bg-soft); }
-.site-header .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1.5rem; padding-top: 0.75rem; padding-bottom: 0.75rem; }
-.site-name { font-weight: 700; font-size: 1.15rem; color: var(--text); text-decoration: none; }
-.site-header ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; list-style: none; margin: 0; padding: 0; font-size: 0.95rem; }
+/* ヘッダー */
+.site-header { background: var(--paper); border-bottom: 1px solid var(--line); }
+.site-header-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 32px; padding-top: 16px; padding-bottom: 16px; }
+.site-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
+.site-mark { display: inline-flex; width: 40px; height: 40px; border-radius: 8px; background: var(--navy); color: #fff; align-items: center; justify-content: center; font-family: var(--font-num); font-weight: 700; font-size: 16px; }
+.site-name { font-family: var(--font-head); font-weight: 900; font-size: 20px; }
+.site-header ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 24px; font-size: 15px; font-weight: 500; }
+.site-header nav a { text-decoration: none; }
+.site-header nav a:hover { text-decoration: underline; }
 
-.site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
+/* フッター */
+.site-footer { background: var(--navy-deep); color: #D3DEEA; }
+.site-footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding-top: 40px; padding-bottom: 40px; font-size: 14px; }
+.site-footer a { color: #fff; }
 
-.lead { font-size: 1.05rem; color: var(--muted); }
+/* 下層ページ共通 */
+h1, h2, h3 { font-family: var(--font-head); line-height: 1.4; }
+.lead { font-size: 1.05rem; color: var(--ink-soft); }
 .section { margin-top: 2.5rem; }
-.card-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; list-style: none; padding: 0; }
-.card-list li { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
-.card-list li h3 { margin: 0 0 0.25rem; font-size: 1rem; }
-.card-list li p { margin: 0; color: var(--muted); font-size: 0.9rem; }
-.item-list { list-style: none; padding: 0; }
-.item-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
-.badge { display: inline-block; font-size: 0.75rem; padding: 0 0.5rem; border-radius: 999px; background: var(--bg-soft); border: 1px solid var(--line); color: var(--muted); margin-left: 0.5rem; }
-.vol-no { display: inline-block; min-width: 4.5em; color: var(--muted); }
-.news-date { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 1rem; }
+.item-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+.item-list li { padding: 0.75rem 0; border-bottom: 1px solid var(--line); }
+.badge { display: inline-block; font-size: 0.75rem; padding: 0 0.6rem; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); color: var(--muted); margin-left: 0.5rem; }
+.vol-no { display: inline-block; min-width: 4.5em; color: var(--muted); font-family: var(--font-num); }
+.news-date { color: var(--muted); font-family: var(--font-num); margin-right: 1rem; }
 .breadcrumb { font-size: 0.875rem; color: var(--muted); }
 article table { border-collapse: collapse; width: 100%; }
 article th, article td { border: 1px solid var(--line); padding: 0.4rem 0.6rem; }

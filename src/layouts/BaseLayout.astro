@@ -7,9 +7,11 @@ import { SITE } from '../site';
 interface Props {
   title?: string;
   description?: string;
+  /** true のとき本文の幅を制限しない（トップページ用） */
+  full?: boolean;
 }
 
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, full = false } = Astro.props;
 const pageTitle = title ? `${title}｜${SITE.name}` : SITE.name;
 ---
 
@@ -21,10 +23,16 @@ const pageTitle = title ? `${title}｜${SITE.name}` : SITE.name;
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@700;900&family=Space+Grotesk:wght@500;700&display=swap"
+    />
   </head>
   <body>
     <SiteHeader />
-    <main class="container">
+    <main class={full ? 'main-full' : 'container main-page'}>
       <slot />
     </main>
     <SiteFooter />
