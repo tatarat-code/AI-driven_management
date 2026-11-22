@@ -14,7 +14,8 @@ export async function getStaticPaths() {
 }
 
 const { v, prev, next } = Astro.props;
-const { Content } = await render(v);
+const { Content, headings } = await render(v);
+const toc = headings.filter((h) => h.depth === 2);
 const line = lineOf(v.data.volume);
 const item = (x?: typeof v) =>
   x ? { href: `/guidebook/${x.id}/`, label: x.data.title, sub: `第${x.data.volume}巻` } : undefined;
@@ -26,7 +27,7 @@ const chapter = chPublished ? `/overview/${chId}/` : undefined;
 <BaseLayout title={`第${v.data.volume}巻 ${v.data.title}`} description={v.data.summary} full>
   <PageHeader
     kicker={`VOL. ${String(v.data.volume).padStart(2, '0')}｜${line.name}`}
-    title={`第${v.data.volume}巻 ${v.data.title}`}
+    title={v.data.heading ?? `第${v.data.volume}巻 ${v.data.title}`}
     lead={v.data.summary}
     color={line.color}
     crumbs={[{ href: '/guidebook/', label: '詳細ガイドブック' }, { label: `第${v.data.volume}巻` }]}
@@ -38,6 +39,14 @@ const chapter = chPublished ? `/overview/${chId}/` : undefined;
   </PageHeader>
 
   <div class="container section-gap">
+    {toc.length > 2 && (
+      <details class="toc" open>
+        <summary>目次</summary>
+        <ul>
+          {toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+        </ul>
+      </details>
+    )}
     <article class="prose">
       <Content />
     </article>
@@ -48,4 +57,11 @@ const chapter = chPublished ? `/overview/${chId}/` : undefined;
 <style>
   .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
   .actions:empty { display: none; }
+  .toc { max-width: 760px; margin: 0 0 32px; padding: 16px 20px; background: #fff; border: 1px solid var(--grid); border-radius: 12px; }
+  .toc summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+  .toc ul { list-style: none; margin: 12px 0 0; padding: 0; columns: 2; column-gap: 32px; }
+  .toc li { break-inside: avoid; margin: 4px 0; font-size: 0.95rem; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .toc a:hover { color: var(--accent); text-decoration: underline; }
+  @media (max-width: 640px) { .toc ul { columns: 1; } }
 </style>

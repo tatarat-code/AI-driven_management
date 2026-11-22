@@ -10,6 +10,7 @@ const guidebook = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/guidebook' }),
   schema: z.object({
     title: z.string(),
+    heading: z.string().optional(), // 本文ページの見出し（正式な巻名）。一覧では title を使う
     volume: z.number().int().min(1).max(15),
     summary: z.string().optional(),
     pdf: z.string().optional(), // 例：/pdf/guidebook/vol01.pdf
@@ -23,6 +24,7 @@ const overview = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/overview' }),
   schema: z.object({
     title: z.string(),
+    heading: z.string().optional(), // 本文ページの見出し（正式な章名）。一覧では title を使う
     order: z.number().int(), // 並び順：はじめに=0、第n章=n、付録=99
     summary: z.string().optional(),
     pdf: z.string().optional(),

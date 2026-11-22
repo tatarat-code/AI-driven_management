@@ -27,7 +27,7 @@ const vol = volPublished ? `/guidebook/${volId}/` : undefined;
 <BaseLayout title={`概要版 ${c.data.title}`} description={c.data.summary} full>
   <PageHeader
     kicker={kicker}
-    title={c.data.title}
+    title={c.data.heading ?? c.data.title}
     lead={c.data.summary}
     color={line?.color}
     crumbs={[{ href: '/overview/', label: '概要版' }, { label: c.data.title }]}
